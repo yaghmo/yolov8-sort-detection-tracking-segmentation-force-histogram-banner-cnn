@@ -1,0 +1,22 @@
+# Usage: pip install -r requirements.txt
+# NOTE: high chances that a library might be forgotten to be listed down here, we appoligize for this inconvenience
+# python 3.9 - 3.10
+
+cvzone>=1.5.6
+ultralytics>=8.0.26
+matplotlib>=3.2.2
+numpy>=1.18.5,<1.24.0
+opencv-python>=4.5.4.60
+Pillow>=7.1.2
+PyYAML>=5.3.1
+requests>=2.23.0
+tifffile>=2023.8.28
+scipy>=1.4.1
+torch>=1.7.0
+torchvision>=0.8.1
+tqdm>=4.45.0
+filterpy==1.4.5
+scikit-mage>=0.19
+protobuf<4.21.3
+lap>=0.40
+
