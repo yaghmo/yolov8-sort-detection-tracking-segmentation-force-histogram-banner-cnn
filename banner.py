@@ -89,7 +89,7 @@ if __name__ == '__main__':
     unique_file_name = 0
     # getting the number masks folders #
     masks = count(folder)
-
+    print("white: pair's masks forlder, magenta: class folder progress, green: trim folder progress.")
     for mask in tqdm(masks, total = len(masks), colour='green'):
         # **************************************************************************************** #
         #                  Grouping all the banners in their corresponding class                   #
@@ -141,4 +141,4 @@ if __name__ == '__main__':
             cv2.imwrite(folder + '/' + class_name + '/' + str(unique_file_name)+'.tif', banner(files, path= folder + '/' + mask + '/' + data + '/'))
             unique_file_name +=1
     
-    print("The data process is finished, white: pair's masks forlder, magenta: class folder progress, green: trim folder progress.")
+    print("The data process is finished.") 

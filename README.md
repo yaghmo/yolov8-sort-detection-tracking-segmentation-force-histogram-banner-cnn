@@ -67,24 +67,43 @@ For more details please check [Yolov8](https://github.com/ultralytics/ultralytic
 
 This project contains 4 main programs which some of them call other modules:
 
-* `📜 main.py` -- is the program that is focused on frame extraction, by giving the path: ``L27. path = 'Data\\'`` and the video name: ``L28. video= 'trim2.mp4'`` it will create two folders inside the folder Data 'Frames' and 'Masks'. you can call the next program directly by uncommenting the section present in the line: 65.
-* `📜 object_detection_to_masks.py` -- is the next step program which can be lunched independently, by leaving the same paths but just changing the name of the video you want to compute this program on `L368. work_on = 'trim2'`, and the folder name of the class: `L378. mask_path = 'Data\\'+work_on+'_Masks\C5\\'` Folder name in this case is named C5.
+* `📜 main.py` -- is the program that is focused on frame extraction, you can call the next program ( not recommended ) directly by uncommenting the section present in the line: 65.
+* `📜 object_detection_to_masks.py` -- is the next step program which can be lunched independently, it creates a folder that will contain saved images of pair of masks that had been selected to be tracked.
 * `📜 banner.py` is the program that generate a banner matrix for every mask folder given in the path and regroupe them all in their corresponding class folder.
 * `📜 CNN.ipynp` is the program computed on Google Colab under TPU runtime, it was used to train the model.
 
-Assuming that you havent change anything:
+You can either pass through argumants or run the code without argument. If an argument is missing, you will need to change manually the variable inside the code. Now assuming that you dont use arguments:
 
 1. Starting by running the code `📜 main.py` whithout the need of uncommenting the 65th line for every tram you want to extract its frame.
-2. Then run `📜 object_detection_to_masks.py` by giving a new name to the folder class so it will create that folder inside the corresponding trim mask folder.
+   manually giving the path and the video name LINE....
+2. Then run `📜 object_detection_to_masks.py` by giving a new name to the folder class so it will create that folder inside the corresponding trim mask folder. manually change the variables LINE.....
 3. After creating all the folders of pair masks wanted, run the program `📜 banner.py` which will arrange the masks files in case they are not ordered in their folder, then create a force banner matrix for every folder of pair masks, and then it will group them all by by their classes and sort them in three folders which will represent their class.
 4. Lastely `📜 CNN.ipynb` comes to train a model on those last created class folders ( banners ).
+
+Using flags:
+
+* you can lunch the previous programs `📜 main.py` ,`📜 object_detection_to_masks.py` and `📜 banner.py` by passing them arguments without the need of changing the variables in the code:
+  1. `📜 main.py` : run the command `python main.py "path to the video"`
+  2. `📜 object_detection_to_masks.py` : run the command `python object_detection_to_masks.py -v "name of the video" -f "path to the folder that contains the video" -m "the name of the model" -t "the name of folder where to save the pair of masks"`
+  3. d
+
+Here's an example of execution according the repertory scheme :
+
+```
+$ python main.py Data/trim.mp4 
+=> X frames extracted to Data/trim_frames/
+$ python object_detection_to_masks.py -v [ trim , trim.pm4 ] -f Data -m [ yolov8l-seg , yolov8l-seg.pt ] -t A0
+# you have the choice for whats in between [ ].
+=> folder A0 created in side Data/trim_masks/ , masks generated and saved in the folder path Data/trim_masks/A0/
+$ banner.py -f -d 
+```
 
 # Citations
 
 sort alghorithm along with force-histogram ( both programs are found inside the folder '📂 utils' )
 
 ```
-@ARTICLE{force,
+@ARTICLE{force_histograme,
   author={Matsakis, P. and Wendling, L.},
   journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
   title={A new way to represent the relative position between areal objects}, 
