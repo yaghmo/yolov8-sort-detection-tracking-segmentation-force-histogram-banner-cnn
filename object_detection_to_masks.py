@@ -18,6 +18,24 @@ from colorama import Fore, Style
 from utils.sort import *
 
 
+# ****************** #
+#  adding arguments  #
+# ****************** #
+def arguments():
+    parser = argparse.ArgumentParser(
+        description='macking pairs of masks in side a given name folder')
+    parser.add_argument('-v', '--video_name', nargs='?', type=str,
+                        help='The name of the video')
+    parser.add_argument('-f', '--folder_path', nargs='?', type=str,
+                        help='The path to th folder that contains the sub folder frames and masks')
+    parser.add_argument('-m', '--model_name', nargs='?', type=str,
+                        help='The model name with its extension')
+    parser.add_argument('-t', '--target_folder', nargs='?', type=str,
+                        help='The folder name to have the masks be stored in')
+    return parser.parse_args()
+
+
+
 # **************************************************************************************** #
 # drawing a bounding box of the detected objects on img that contains the clicked area x,y #
 # **************************************************************************************** #
@@ -67,8 +85,6 @@ def boundingbox(results, x, y, img):
 
                 region = np.vstack((region, [x1, y1, x2, y2, conf]))
 
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
 
 
 # ******************************************* #
@@ -113,6 +129,7 @@ def running_file(typ, index=0):
 
     cv2.destroyAllWindows()
     return img, i
+
 
 
 # ***************************************** #
@@ -178,14 +195,13 @@ def get_masks(typ, index, threshold):
                             masked[int(ID)-1] = mask_resized
             cv2.imshow('Image', img)
 
-            '''
-            # NOTE: section for masks display
+            
             for j, mask in enumerate(masked):
                 cv2.imwrite(f'{mask_path + str(i)}_mask_{j+1}.jpg', mask)
                 # you can resize the masks if you wish to #
+                '''
                 cv2.imshow(f'Mask{j+1}', mask)
-            '''
-
+                '''
             cv2.waitKey(1)
 
             if cv2.getWindowProperty('Image', cv2.WND_PROP_VISIBLE) == 0:
@@ -198,6 +214,7 @@ def get_masks(typ, index, threshold):
         NOTE: This section is not finished yet
         """
         # cap = cv2.videocaptue
+
 
 
 # ****************************** #
@@ -231,6 +248,7 @@ def mouse_callback(event, x, y, flags, param):
         cv2.imshow('Image', img)
 
 
+
 # ****************************** #
 # determine the objects to track #
 # ****************************** #
@@ -262,7 +280,8 @@ def tracked_seg():
             'Type in 1 to choose a detected object or 2 to select a region \n')
 
     print('##################################################################################')
-    print_warning('! Please press s if you want to validate any displayed spot on the image !')
+    print_warning(
+        '! Please press s if you want to validate any displayed spot on the image !')
     waiting = True
     while waiting:
         try:
@@ -356,12 +375,14 @@ def tracked_seg():
     return number_region
 
 
+
 # *********************** #
 # tiny def for conversion #
 # *********************** #
 def xyxy_to_bbox(x1, y1, x2, y2):
     # convert xyxy to xywh #
     return x1, y1, x2-x1, y2-y1
+
 
 # *********** #
 # Warning def #
@@ -371,36 +392,52 @@ def print_warning(message):
     print(warning_text)
 
 
-
 # ************************************************************************************************************************* #
 if __name__ == '__main__':
 
-    #************************ init variables **************************#
-    #         dont forget to reset these following variables           #
-    #******************************************************************#
+    # calling args #
+    args = arguments()
 
-    try:
+    #********************************** init variables ***********************************#
+    #  dont forget to reset these following variables that comes after every else: block  #
+    #*************************************************************************************#
 
-        # ******************* the name of video ********************* #
+    # ******************* the name of video ********************* #
+    if args.video_name:
+        _, dot = os.path.splitext(args.video_name)
+        dot = len(dot)
+        if dot > 0:
+            work_on = args.video_name[:-dot]
+        else:
+            work_on = args.video_name
+    else:
         work_on = 'trim1'
-        # **************** the pathe to the Frames ****************** #
+
+    # **************** the pathe to the Frames ****************** #
+
+    if args.folder_path:
+        frame_path = os.path.join(args.folder_path, work_on + '_Frames', "")
+    else:
         frame_path = 'Data/'+work_on+'_Frames/'
 
-        """
-        NOTE:
-        Creating a sub folder for the classes, ex: A0 is a folder where a set of one pair of masks for the class `players of the 1st team` are stored
-        you can name them however you want just make sure to keep the same logic and leave each pair separated in its own folder
-        also dont forget to change the paths at that case on the 2nd code
-        """
+    """
+    NOTE:
+    Creating a sub folder for the classes, ex: A0 is a folder where a set of one pair of masks for the class `players of the 1st team` are stored
+    you can name them however you want just make sure to keep the same logic and leave each pair separated in its own folder
+    also dont forget to change the paths at that case on the 2nd code
+    """
+    if args.target_folder:
+        mask_path = os.path.join(args.folder_path, work_on + '_Masks', "", args.target_folder, "")
+    else:
         mask_path = 'Data/'+work_on+'_Masks/A0/'
 
-        # *************************** #
-        # making a file for the masks #
-        # *************************** #
-        if not os.path.exists(mask_path):
-            os.makedirs(mask_path)
-    except:
-        print('Check your paths please ↑')
+    # *************************** #
+    # making a file for the masks #
+    # *************************** #
+    if not os.path.exists(mask_path):
+        os.makedirs(mask_path)
+    # except:
+    #     print('Check your passed through arguments please ↑')
     """
     NOTE: What's above are the paths initialization if this programme is ran independently ( Skipping the main )
     Make sure to change name for mask_path every time you create a new set of masks for the same image.
@@ -408,79 +445,90 @@ if __name__ == '__main__':
     WARNING: PLEASE MAKE SURE THE FRAME'S FOLDER EXIST AND THE NAME OF THE VIDEO PRESENT IN SAME REPERTORY WITH THAT FOLDER EXISTS TOO
     """
 
+try:
+    '''
+    NOTE: The folowwing is a must run, either if this module is called or being a main
+    '''
+    # ******************************************** #
+    # getting the number of frames from the folder #
+    # ******************************************** #
+    num_files = len([f for f in os.listdir(frame_path)
+                    if not f.startswith('.')]) - 1
 
-'''
-NOTE: The folowwing is a must run, either if this module is called or being a main
-'''
-# ******************************************** #
-# getting the number of frames from the folder #
-# ******************************************** #
-num_files = len([f for f in os.listdir(frame_path)
-                if not f.startswith('.')]) - 1
+    # ***************************************************** #
+    #  loading the pretrained model with extralarge wights  #
+    # NOTE: In this case, large weights are used for yolov8 #
+    # ***************************************************** #
+    if args.model_name:
+        _, dot = os.path.splitext(args.model_name)
+        dot = len(dot)
+        if dot == 0:
+            model = YOLO(os.path.join(
+                'Model-Weights', args.model_name + '.pt'))
+        else:
+            model = YOLO(os.path.join(
+                'Model-Weights', args.model_name))
+    else:
+        model = YOLO("Model-Weights/yolov8n-seg.pt")
 
-# ***************************************************** #
-#  loading the pretrained model with extralarge wights  #
-# NOTE: In this case, large weights are used for yolov8 #
-# ***************************************************** #
-model = YOLO("Model-Weights/yolov8n-seg.pt")
+    # change this according to your resolution preferences #
+    width, height = 1920, 1080
 
-# change this according your resolution preferences #
-width, height = 1920, 1080
+    print_warning("! Press the space bar key to stop the video on the frame you want to start tracking objects from !\n Closing the window will finish the process.")
+    typ = input('Please type 1 if you want to run images, 2 for the video \n')
+    while typ not in ['1', '2'] and len(typ) != 1:
+        print('Please put a valid number')
+        typ = input('Type in 1 to choose to run images or 2 for the video \n')
 
-print_warning("! Press the space bar key to stop the video on the frame you want to start tracking objects from !\n Closing the window will finish the process.")
-typ = input('Please type 1 if you want to run images, 2 for the video \n')
-while typ not in ['1', '2'] and len(typ) != 1:
-    print('Please put a valid number')
-    typ = input('Type in 1 to choose to run images or 2 for the video \n')
+    # ****************** #
+    # running the frames #
+    # ****************** #
+    if typ == '1':
+        img, index = running_file('img')
+    else:
+        img, index = running_file('vid')
 
-# ****************** #
-# running the frames #
-# ****************** #
-if typ == '1':
-    img, index = running_file('img')
-else:
-    img, index = running_file('vid')
+    couple = np.empty((0, 2), int)
+    region = np.empty((0, 5))
+    masked = []
 
-couple = np.empty((0, 2), int)
-region = np.empty((0, 5))
-masked = []
+    region_selection = True
+    detection_selection = False
+    stacker = False
+    X, Y = 0, 0
+    point = 'P1'
+    original, pointed, regioned = img.copy(), img.copy(), img.copy()
 
-region_selection = True
-detection_selection = False
-stacker = False
-X, Y = 0, 0
-point = 'P1'
-original, pointed, regioned = img.copy(), img.copy(), img.copy()
+    # object selection function #
+    nbr_seg = tracked_seg()
 
-# object selection function #
-nbr_seg = tracked_seg()
+    # ************ #
+    # tracker init #
+    # ************ #
+    tracker = Sort(max_age=100)
+    tracked = tracker.update(region)
 
+    # display masks and tracked items #
+    img = cv2.resize(cv2.imread(f'{frame_path}{index}.jpg'), (width, height))
+    for found in tracked:
+        x1, y1, x2, y2, ID = found
+        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+        bbox = xyxy_to_bbox(x1, y1, x2, y2)
+        cvzone.cornerRect(img, bbox, l=10)
+        cvzone.putTextRect(img, f'ID: #{int(ID)}', (max(0, x1), max(
+            15, y1-5)), thickness=1, scale=1, offset=3)
 
-# ************ #
-# tracker init #
-# ************ #
-tracker = Sort(max_age=100)
-tracked = tracker.update(region)
+    cv2.imshow('Image', img)
+    """
+    NOTE: in this case only we display 2 concatenated masks
+    """
+    cv2.imshow('Masks', np.concatenate(
+        (cv2.resize(masked[0], (720, 480)), cv2.resize(masked[1], (720, 480))), axis=1))
+    cv2.waitKey(3000)
+    cv2.destroyAllWindows()
 
-# display masks and tracked items #
-img = cv2.resize(cv2.imread(f'{frame_path}{index}.jpg'), (width, height))
-for found in tracked:
-    x1, y1, x2, y2, ID = found
-    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-    bbox = xyxy_to_bbox(x1, y1, x2, y2)
-    cvzone.cornerRect(img, bbox, l=10)
-    cvzone.putTextRect(img, f'ID: #{int(ID)}', (max(0, x1), max(
-        15, y1-5)), thickness=1, scale=1, offset=3)
-
-cv2.imshow('Image', img)
-"""
-NOTE: in this case only we display 2 concatenated masks
-"""
-cv2.imshow('Masks', np.concatenate((cv2.resize(masked[0], (720, 480)), cv2.resize(masked[1], (720, 480))), axis=1))
-cv2.waitKey(3000)
-cv2.destroyAllWindows()
-
-
-# get masks from the rest of frames #
-# NOTE: change this Threshold as needed it representse a range for the bbox to be accepted as tracked, the bigger 
-get_masks('img', index, threshold=100)
+    # get masks from the rest of frames #
+    # NOTE: change this Threshold as needed it representse a range for the bbox to be accepted as tracked, the bigger
+    get_masks('img', index, threshold=100)
+except:
+    print("Please check your paths and excistance of your files (°◡ °♡).")
