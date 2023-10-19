@@ -1,17 +1,8 @@
 # Abstract
 
-This project focuses on the analysis of spatial and temporal relationships among objects in videos
-by employing the Force Banner concept and integrating it into a learning process. The project
-follows several key steps, including video reading and frame separation, object detection and seg-
-mentation, object tracking over time, computation of Force Histograms between pairs of objects
-(masks) that will represent a descriptor for each frame, and construction of the Force Banner using
-the obtained descriptors. The project’s methodology will be tested and compared on various types
-of videos, including synthetic sequences and real-world datasets comprising action scenarios and
-drone footage. The progress will also involve integrating the developed approach into a learning
-process, potentially utilizing convolutional neural networks (CNNs) for enhanced prediction of
-complex spatiotemporal situations. By leveraging the proposed methodology, this project aims to
-contribute to the analysis of object dynamics in videos by a prediction of their spatiotemporal pat-
-terns, with potential applications in domains such as action recognition and video understanding.
+This project is centered around the analysis of spatial and temporal relationships among objects in videos, employing the Force Banner concept and integrating it into a learning process. The project encompasses several key steps, including video parsing and frame separation, object detection, and segmentation using YOLOv8, object tracking over time using the SORT algorithm, calculation of Force Histograms between pairs of objects (masks) to serve as descriptors for each frame, and the creation of the Force Banner using the derived descriptors. The methodology of the project will be tested and compared across various video types, including synthetic sequences and real-world datasets that feature action scenarios and drone footage.
+
+Furthermore, the project will involve the integration of the developed approach into a learning process, potentially incorporating convolutional neural networks (CNNs) to enhance predictions of complex spatiotemporal situations. By leveraging the proposed methodology, this project aims to contribute to the analysis of object dynamics in videos, predicting their spatiotemporal patterns. This has potential applications in domains such as action recognition and video understanding.
 
 # Dependencies
 
