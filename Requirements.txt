@@ -16,7 +16,7 @@ torch>=1.7.0
 torchvision>=0.8.1
 tqdm>=4.45.0
 filterpy==1.4.5
-scikit-mage>=0.19
+scikit-image>=0.19
 protobuf<4.21.3
 lap>=0.40
 
