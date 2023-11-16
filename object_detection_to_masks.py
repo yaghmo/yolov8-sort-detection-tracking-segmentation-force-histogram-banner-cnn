@@ -54,8 +54,7 @@ def boundingbox(results, x, y, img):
     global detection_selection, region, stacker, masked
 
     # for every detected object called box #
-    for box, mask in zip(results[0].boxes, results[0].masks.masks):
-
+    for box, mask in zip(results[0].boxes, results[0].masks.data):
         # coordinate of top/left corner + bot/right corner #
         x1, y1, x2, y2 = box.xyxy[0]
         x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
@@ -154,7 +153,7 @@ def get_masks(typ, index, threshold):
             # reading all the rest of files #
             img = cv2.resize(cv2.imread(
                 f'{frame_path}{i}.jpg'), (width, height))
-            results = model(img, classes=[0])
+            results = model(img, classes=[0],device='gpu')
             region = np.empty((0, 5))
 
             # small size mask #
@@ -191,7 +190,7 @@ def get_masks(typ, index, threshold):
                         # Threshold #
                         if sum(abs(np.array([x1, y1, x2, y2]) - np.array([x1_id, y1_id, x2_id, y2_id]))) < threshold:
                             mask_resized = cv2.resize(
-                                (results[0].masks.masks[id_mask].numpy()*255).astype('uint8'), (720, 480))
+                                (results[0].masks.data[id_mask].numpy()*255).astype('uint8'), (720, 480))
                             masked[int(ID)-1] = mask_resized
             cv2.imshow('Image', img)
 
@@ -271,7 +270,7 @@ def tracked_seg():
 
     if typ == '1':
         print('Loading . . .')
-        results = model(img, classes=[0])
+        results = model(img, classes=[0], device='cpu')
         region_selection = False
         detection_selection = True
     while typ not in ['1', '2'] and len(typ) != 1:
@@ -295,7 +294,6 @@ def tracked_seg():
     else:
         number_region = min(4, number_region)
     cv2.waitKey(0)
-
     # redisplaying the paused window for the selection #
     cv2.namedWindow("Image")
     cv2.imshow('Image', img)
@@ -502,6 +500,7 @@ try:
     # object selection function #
     nbr_seg = tracked_seg()
 
+    
     # ************ #
     # tracker init #
     # ************ #
@@ -531,4 +530,4 @@ try:
     # NOTE: change this Threshold as needed it representse a range for the bbox to be accepted as tracked, the bigger
     get_masks('img', index, threshold=100)
 except:
-    print("Please check your paths and excistance of your files (°◡ °♡).")
+    print("Please check your paths and existence of your files (°◡ °♡).")
